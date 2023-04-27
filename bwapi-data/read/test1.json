@@ -1,0 +1,18 @@
+[
+  {
+    "supplyNeeded":9,
+    "unitToBuild":"Terran_Supply_Depot"
+  },
+  {
+    "supplyNeeded":11,
+    "unitToBuild":"Terran_Barracks"
+  },
+  {
+    "supplyNeeded":15,
+    "unitToBuild":"Terran_Supply_Depot"
+  },
+  {
+    "supplyNeeded":22,
+    "unitToBuild":"Terran_Supply_Depot"
+  }
+]
