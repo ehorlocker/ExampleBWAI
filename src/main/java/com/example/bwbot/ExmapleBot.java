@@ -4,40 +4,34 @@ import bwapi.*;
 import bwem.BWEM;
 import bwem.Base;
 
+import bwta.BWTA;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jbweb.Blocks;
 import jbweb.JBWEB;
+import sun.awt.image.ImageWatched;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.lang.reflect.Array;
+import java.util.*;
 
 /********************************************
- *  TODO: CC functionality at 18 supply     *
- *      - Identify where the closest        *
- *      base is                             *
- *      - Make sure it is secure with       *
- *      existing units                      *
- *  TODO: Build order JSON creator!         *
- *  TODO: Refinery/Gas functionality        *
- *  TODO: toBeBuilt into priority queue     *
- *                                          *
- *  then we move on to combat and moving    *
- *  units around the map                    *
+ *  TODO: Add toBeBuilt to StrategyManager  *
+ *        It might have custom objects idk  *
  *                                          *
  *  this may get recreated at some point    *
  *  once we're at spaghetti                 *
  ********************************************/
 
 class ExampleBot extends DefaultBWListener {
+
+
     int ONE_TILE = TilePosition.SIZE_IN_PIXELS;
     BWClient bwClient;
-    Game game;
-    BWEM bwem;
-    Player self;
+    static Game game;
+    static BWEM bwem;
+    BWTA bwta;
+    static Player self;
     Race race;
     int buildOrderStep = 0;
     boolean waitForBuildOrder = false;
@@ -46,20 +40,19 @@ class ExampleBot extends DefaultBWListener {
 
     //This will need to change to a priority queue
     Queue<UnitType> toBeBuilt = new LinkedList<UnitType>();
-    ArrayList<UnitType> beingBuilt = new ArrayList<UnitType>();
+    ArrayList<Pair<UnitType, Unit>> beingBuilt = new ArrayList<Pair<UnitType, Unit>>();
     ArrayList<Unit> workersBuilding = new ArrayList<Unit>();
+    ArrayList<Unit> workersExploring = new ArrayList<Unit>();
     ArrayList<Unit> raxArray = new ArrayList<Unit>();
+    ArrayList<ResourceCenter> ccArray = new ArrayList<ResourceCenter>();
     ArrayList<Unit> scvArray = new ArrayList<Unit>();
     ArrayList<Unit> marineArray = new ArrayList<Unit>();
 
-    Queue<BuildOrder> buildOrderQueue = new LinkedList<BuildOrder>();
 
-    public void readBuildOrder()
-            throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        buildOrderQueue = new LinkedList<BuildOrder>(Arrays.asList(mapper.readValue(new File("bwapi-data/read/test1.json"), BuildOrder[].class)));
-        //System.out.println(buildOrderQueue);
-    }
+    boolean firstCC = true;
+
+    Base latestBase;
+
 
     @Override
     public void onStart() {
@@ -70,20 +63,26 @@ class ExampleBot extends DefaultBWListener {
         bwem.initialize();
         self = game.self();
         race = self.getRace();
-        try {
-           readBuildOrder();
-        }
-        catch (Exception exception) {
-           exception.printStackTrace();
-        }
 
-        game = bwClient.getGame();
-        bwem = new BWEM(game);
-        bwem.initialize();
-        bwem.getMap().assignStartingLocationsToSuitableBases();
 
         JBWEB.onStart(game, bwem);
         Blocks.findBlocks();
+        GameManager.getInstance();
+
+        /*for(Base base : bwem.getMap().getBases()) {
+            System.out.println(base.getLocation() + " VS " + self.getStartLocation());
+            if(base.getLocation().getApproxDistance(self.getStartLocation()) == 0) {
+                System.out.println("SETTING STARTING LOCATION...");
+                latestBase = base;
+            }
+        }
+
+        for(Unit unit: game.getAllUnits()) {
+            if(unit.getType() == UnitType.Terran_Command_Center) {
+                System.out.println("ADDING CC...");
+                ccArray.add(new ResourceCenter(unit));
+            }
+        }*/
     }
 
     @Override
@@ -92,35 +91,46 @@ class ExampleBot extends DefaultBWListener {
         game.drawTextScreen(20, 20, "SCV Count: " + scvArray.size());
         game.drawTextScreen(20, 30, "Barracks Count: " + raxArray.size());
 
+        GameManager.getInstance().update();
 
-
-        for (final Base base : bwem.getMap().getBases()) {
+        for (final BaseInfo baseInfo : GameManager.getInstance().getBaseList()) {
+            Base base = baseInfo.getBase();
             game.drawBoxMap(
                     base.getLocation().toPosition(),
                     base.getLocation().toPosition().add(new Position(128, 96)),
                     Color.Blue);
-            if(base.isStartingLocation()) {
-                game.drawTextMap(
-                        base.getCenter().getX() - 40,
-                        base.getCenter().getY() - ONE_TILE * 2,
-                        ("SCV Count: " + scvArray.stream().count() + "/16"),
-                        Text.White);
-            }
+            game.drawTextMap(
+                    base.getCenter().getX() - 40,
+                    base.getCenter().getY() - ONE_TILE * 2,
+                    ("SCV Count: " + baseInfo.getWorkerCount() + "/16"),
+                    Text.White);
         }
+
 
         //Blocks.draw();
 
         // Make SCVs
-        for (Unit trainer : self.getUnits()) {
+        /*for (Unit trainer : self.getUnits()) {
             if (trainer.getType() == UnitType.Terran_Command_Center)
             {
                 if (game.canMake(UnitType.Terran_SCV, trainer) &&
                         !trainer.isTraining() &&
                         toBeBuilt.isEmpty() &&
-                        scvArray.size() < 16) {
+                        .size() < 16) {
                     System.out.println("TRAINING SCV");
                     trainer.train(UnitType.Terran_SCV);
                 }
+            }
+        }*/
+
+        /*for(ResourceCenter commandCenter : ccArray) {
+            if(game.canMake(UnitType.Terran_SCV, commandCenter.getUnit()) &&
+                commandCenter.getScvArray().size() < 16 &&
+                !commandCenter.getUnit().isTraining() &&
+                toBeBuilt.isEmpty()) {
+                System.out.println("TRAINING SCV");
+                commandCenter.getUnit().train(UnitType.Terran_SCV);
+                commandCenter.addScv(commandCenter.getUnit().getBuildUnit());
             }
         }
 
@@ -147,44 +157,70 @@ class ExampleBot extends DefaultBWListener {
 
 
         if(!toBeBuilt.isEmpty() && game.canMake(toBeBuilt.peek())) {
-            for (Unit unit: self.getUnits()) {
-                if (unit.getType().isWorker() && (unit.isIdle() || unit.isGatheringMinerals()))
-                {
-                    Unit builder = unit;
-                    System.out.println("SETTING " + builder + " TO BUILD " + toBeBuilt.peek() + "...");
-                    // build supply depot
-                    TilePosition buildLocation = game.getBuildLocation(race.getSupplyProvider(), self.getStartLocation());
-                    builder.build(toBeBuilt.peek(), buildLocation);
-                    builder.gather(getClosestMineral(builder), true);
-                    workersBuilding.add(builder);
+            for (ResourceCenter commandCenter : ccArray) {
+                for(Unit unit : commandCenter.getScvArray()) {
+                    if ((unit.isIdle() || unit.isGatheringMinerals()))
+                    {
+                        System.out.println("SENDING " + unit + " TO BUILD " + toBeBuilt.peek() + "...");
+                        TilePosition buildLocation;
+                        // set position for building
+                        if(toBeBuilt.peek() == UnitType.Terran_Command_Center)  {
+                            //get buildLocation of next base
+                            buildLocation = getClosestBase(latestBase).getLocation();
+                            //check if unexplored, then order to move
+                            unit.move(buildLocation.toPosition());
+                        }
+                        else {
+                            buildLocation = game.getBuildLocation(race.getSupplyProvider(), self.getStartLocation());
+                            unit.build(toBeBuilt.peek(), buildLocation);
+                            unit.gather(getClosestMineral(unit), true);
+                        }
 
-                    System.out.println("ADDING BUILDING TO BEINGBUILT");
-                    beingBuilt.add(toBeBuilt.remove());
-                    break;
+                        System.out.println("ADDING BUILDING TO BEINGBUILT");
+                        beingBuilt.add(new Pair(toBeBuilt.remove(), unit));
+                        break;
+                    }
                 }
             }
         }
+        //if we have to move a unit before building, we check to see if the builder
+        //is idle before issuing build command.
+        if(!beingBuilt.isEmpty()) {
+            for(Pair<UnitType, Unit> beingBuiltPair : beingBuilt) {
+                if(beingBuiltPair.getRight().isIdle() &&
+                        beingBuiltPair.getLeft() == UnitType.Terran_Command_Center) {
+                    beingBuiltPair.getRight().build(beingBuiltPair.getLeft(), getClosestBase(latestBase).getLocation());
+                }
+            }
+        }*/
 
     }
 
     @Override
     public void onUnitComplete(Unit unit) {
-        Unit closestMineral = getClosestMineral(unit);
+        if(game.elapsedTime() > 4)
+            GameManager.getInstance().addUnitToUnitList(unit);
+        /*Unit closestMineral = getClosestMineral(unit);
 
-        if(unit.getType().isWorker()) {
+        if(unit.getType() == UnitType.Terran_Command_Center) {
+            if(firstCC)
+                firstCC = false;
+            else
+                ccArray.add(new ResourceCenter(unit));
+        }
+        else if(unit.getType().isWorker() && !ccArray.isEmpty()) {
             unit.gather(closestMineral);
-            scvArray.add(unit);
+            ccArray.get(0).addScv(unit);
         }
         else if(unit.getType().isBuilding() &&
                     unit.getType().getRace() == race &&
-                    !workersBuilding.isEmpty()) {
-            Unit builder = workersBuilding.get(beingBuilt.indexOf(unit.getType()));
-            workersBuilding.remove(builder);
-            beingBuilt.remove(unit.getType());
+                    !beingBuilt.isEmpty()) {
+            beingBuilt.remove(new Pair(unit.getType(), UnitType.Terran_SCV));
             if(unit.getType() == UnitType.Terran_Barracks) {
                 raxArray.add(unit);
             }
-        }
+        }*/
+
     }
 
     void run() {
@@ -214,14 +250,26 @@ class ExampleBot extends DefaultBWListener {
         return closestMineral;
     }
 
-    /*public Base getClosestBase(Base latestBase) {
-        return new Base();
-    }*/
+    //this might be able to get removed cause bwta has a function for this
 
-    public void earlyGameBuildOrderChecks() {
+
+    public Unit getClosestCommandCenter(Unit unit) {
+        Unit closestCommandCenter = null;
+        int closestDistance = Integer.MAX_VALUE;
+        for (ResourceCenter commandCenter : ccArray) {
+            int distance = unit.getDistance(commandCenter.getUnit());
+            if (distance < closestDistance) {
+                closestCommandCenter = commandCenter.getUnit();
+                closestDistance = distance;
+            }
+        }
+        return closestCommandCenter;
+    }
+
+    /*public void earlyGameBuildOrderChecks() {
         if(!buildOrderQueue.isEmpty() && buildOrderQueue.peek().isBuildOrderStep(self.supplyUsed())) {
             System.out.println("Build order calls for: " + buildOrderQueue.peek().getUnitToBuild());
             toBeBuilt.add(buildOrderQueue.remove().getUnitToBuild());
         }
-    }
+    }*/
 }
