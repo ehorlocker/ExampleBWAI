@@ -88,8 +88,6 @@ class ExampleBot extends DefaultBWListener {
     @Override
     public void onFrame() {
         game.drawTextScreen(100, 100, "");
-        game.drawTextScreen(20, 20, "SCV Count: " + scvArray.size());
-        game.drawTextScreen(20, 30, "Barracks Count: " + raxArray.size());
 
         GameManager.getInstance().update();
 

@@ -17,6 +17,7 @@ public class ExampleUnit {
 
     public void update() {
         if(/*unit.isIdle() &&*/ commandManager.hasCommands()) {
+            DebugManager.print(unit.getType() + " - " + unit.toString() + " is going to do things");
             unit.issueCommand(commandManager.popCommand().getUnitCommand());
         }
     }

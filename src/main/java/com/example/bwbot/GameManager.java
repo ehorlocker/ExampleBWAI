@@ -21,7 +21,7 @@ public class GameManager {
 
     private static Queue<BuildOrder> buildOrderQueue = new LinkedList<BuildOrder>();
 
-    private static List<BaseInfo> expansionBaseList;
+    private static List<BaseInfo> expansionBaseList = new LinkedList<BaseInfo>();
 
     private static Race race;
 
