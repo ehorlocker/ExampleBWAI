@@ -30,5 +30,5 @@ In the example above, a `Terran_Supply_Depot` will be made when the player reach
 
 ## Demo
 
-The bot currently follows the build order established by test.json, but does not finish it because it only creates 16 units, making it not continue to the next building defined in the json. This is the state of the bot as of 09/11/23.
+The bot currently follows the build order established by test.json, but does not finish it because it only creates 16 units, making it not continue to the next building defined in the json. Unfortunately, GitHub only allows 10MB video files, so the demo can be found [here](https://youtu.be/m-fmlQijkec).
 
