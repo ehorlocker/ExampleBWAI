@@ -47,9 +47,11 @@ public class StrategyManager {
             if(toBeBuilt.peek() != null && ExampleBot.game.canMake(toBeBuilt.peek())) {
                 //if there is, assign a worker to build it
                 for (Worker worker : GameManager.getWorkerList()) {
+                    // if a worker is idle or gathering minerals
                     if (worker.getUnit().getType() == GameManager.getRace().getWorker() &&
                             worker.getUnit().isIdle() || worker.getUnit().isGatheringMinerals()) {
                         UnitType buildingToBeBuilt = toBeBuilt.poll();
+                        // if we're building a command center
                         if(buildingToBeBuilt != null && buildingToBeBuilt == GameManager.getRace().getResourceDepot()) {
                             /*BaseInfo closestBase = null;
                             for(Base base : ExampleBot.bwem.getMap().getBases()) {
@@ -81,6 +83,7 @@ public class StrategyManager {
                                                                 buildingLocation,
                                                                 buildingToBeBuilt),
                                                                 priority));
+            // we need to keep track of the unit we build i.e. barracks
             beingBuilt.add(buildingToBeBuilt);
         }
 

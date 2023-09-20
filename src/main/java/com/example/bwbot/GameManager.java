@@ -17,7 +17,9 @@ public class GameManager {
     private static List<ExampleUnit> unitList;
     private static List<BaseInfo> playerBaseList;
     private static List<Worker> workerList;
+    private static List<ExampleUnit> raxList;
     private static StrategyManager strategyManager;
+
 
     private static Queue<BuildOrder> buildOrderQueue = new LinkedList<BuildOrder>();
 
@@ -38,6 +40,7 @@ public class GameManager {
         unitList = new ArrayList<ExampleUnit>();
         playerBaseList = new ArrayList<BaseInfo>();
         workerList = new ArrayList<Worker>();
+        raxList = new ArrayList<ExampleUnit>();
         race = ExampleBot.game.self().getRace();
         strategyManager = new StrategyManager();
 
@@ -84,6 +87,9 @@ public class GameManager {
         for(BaseInfo baseInfo: playerBaseList) {
             baseInfo.getResourceDepot().update();
         }
+        for(ExampleUnit rax: raxList) {
+            rax.addCommand(new ExampleUnitCommand(UnitCommand.train(rax.getUnit(), UnitType.Terran_Marine), PRIORITY_ONE));
+        }
         strategyManager.update();
     }
 
@@ -126,6 +132,11 @@ public class GameManager {
                 }
 
             }
+        }
+        else if (unit.getType() == UnitType.Terran_Barracks) {
+            ExampleUnit raxExampleUnit = new ExampleUnit(unit);
+            raxList.add(raxExampleUnit);
+            unitList.add(raxExampleUnit);
         }
 
     }

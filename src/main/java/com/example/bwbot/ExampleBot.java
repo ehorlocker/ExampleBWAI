@@ -5,14 +5,9 @@ import bwem.BWEM;
 import bwem.Base;
 
 import bwta.BWTA;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jbweb.Blocks;
 import jbweb.JBWEB;
-import sun.awt.image.ImageWatched;
 
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.*;
 
 /********************************************
@@ -196,8 +191,15 @@ class ExampleBot extends DefaultBWListener {
 
     @Override
     public void onUnitComplete(Unit unit) {
+        // janky fix for units not always getting added to the unit list
         if(game.elapsedTime() > 4)
             GameManager.getInstance().addUnitToUnitList(unit);
+
+        // TODO: a better way to filter buildings for GameManager
+        if(unit.getType() == UnitType.Terran_Barracks) {
+            GameManager.getInstance().addUnitToUnitList(unit);
+        }
+
         /*Unit closestMineral = getClosestMineral(unit);
 
         if(unit.getType() == UnitType.Terran_Command_Center) {
