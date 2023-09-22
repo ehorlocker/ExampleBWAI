@@ -1,15 +1,11 @@
 package com.example.bwbot;
 
 import bwapi.*;
-import bwem.BWEM;
-import bwem.BWMap;
 import bwem.Base;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jdk.nashorn.internal.runtime.Debug;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.Array;
 import java.util.*;
 
 public class GameManager {
