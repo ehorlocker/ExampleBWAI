@@ -47,13 +47,13 @@ public class GameManager extends BroodWarEventListener {
         for(Unit startingUnit : game.self().getUnits()) {
             if(startingUnit.getType().isBuilding()) {
                 addUnitToUnitList(startingUnit);
-                DebugManager.print("Adding " + startingUnit.getType() + " to UnitList...");
+                Debug.print("Adding " + startingUnit.getType() + " to UnitList...");
             }
         }
         for(Unit startingUnit : game.self().getUnits()) {
             if(!startingUnit.getType().isBuilding()) {
                 addUnitToUnitList(startingUnit);
-                DebugManager.print("Adding " + startingUnit.getType() + " to UnitList...");
+                Debug.print("Adding " + startingUnit.getType() + " to UnitList...");
             }
         }
         // we need to make a list of expansions to move to so we begin by adding
@@ -85,7 +85,6 @@ public class GameManager extends BroodWarEventListener {
 
     @Override
     public void onFrame() {
-        System.out.println("onFrame");
         for(ExampleUnit exampleUnit : unitList) {
             exampleUnit.update();
         }
@@ -127,7 +126,7 @@ public class GameManager extends BroodWarEventListener {
             // and add it to the BaseInfo object that has that base
             Base closestBase = ExampleUtils.getClosestBase(worker.getUnit());
             if(playerBaseList.isEmpty()) {
-                DebugManager.print("baseList was empty when trying to add " + worker.getUnit());
+                Debug.print("baseList was empty when trying to add " + worker.getUnit());
             }
             for(BaseInfo baseInfo: playerBaseList) {
                 //DebugManager.print("base in baseList: " + baseInfo.getBase().toString());

@@ -69,11 +69,16 @@ public class BroodWarClient extends DefaultBWListener {
         game = bwClient.getGame();
 
         bwem = new BWEM(game);
-        bwem.initialize();
+        try {
+            bwem.initialize();
+            JBWEB.onStart(game, bwem);
+            Blocks.findBlocks();
+        } catch (Exception e) {
+            Debug.print(e.toString());
+        }
         player = game.self();
 
-        JBWEB.onStart(game, bwem);
-        Blocks.findBlocks();
+        Debug debug = new Debug();
         //FIXME: this sucks
         GameManager.getInstance();
 

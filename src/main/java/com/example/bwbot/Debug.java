@@ -3,21 +3,31 @@ package com.example.bwbot;
 import bwapi.*;
 import bwem.Base;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 //TODO: Switch to log4j
-public class DebugManager extends DefaultBWListener {
+public class Debug extends BroodWarEventListener {
     int ONE_TILE = TilePosition.SIZE_IN_PIXELS;
     private static final boolean debug = true;
+    private static final Logger logger = LogManager.getLogger("debug");
+
+    public Debug() {
+        BroodWarClient.getInstance().addListener(this);
+    }
 
     public static void print(String out) {
         if(debug) {
-            System.out.println(out);
+            //System.out.println(out);
+            logger.info(out);
         }
     }
 
     @Override
     public void onFrame() {
-        drawBases();
-        BroodWarClient.getGame().drawTextScreen(100, 100, "Hello World!");
+        if (debug) {
+            drawBases();
+        }
     }
 
     private void drawBases() {

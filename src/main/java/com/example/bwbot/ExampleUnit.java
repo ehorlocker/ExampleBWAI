@@ -1,8 +1,6 @@
 package com.example.bwbot;
 
 import bwapi.Unit;
-import bwapi.UnitCommand;
-import jdk.nashorn.internal.runtime.Debug;
 
 //cannot be an is-a relationship because we do not have access to the default constructor
 public class ExampleUnit {
@@ -17,7 +15,7 @@ public class ExampleUnit {
 
     public void update() {
         if(/*unit.isIdle() &&*/ commandManager.hasCommands()) {
-            DebugManager.print(unit.getType() + " - " + unit.toString() + " is going to do things");
+            Debug.print(unit.getType() + " - " + unit.toString() + " is going to do things");
             unit.issueCommand(commandManager.popCommand().getUnitCommand());
         }
     }

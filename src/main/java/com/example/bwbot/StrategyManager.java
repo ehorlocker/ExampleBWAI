@@ -1,8 +1,6 @@
 package com.example.bwbot;
 
 import bwapi.*;
-import bwem.Base;
-import sun.security.jca.GetInstance;
 
 import java.util.*;
 
@@ -17,7 +15,7 @@ public class StrategyManager {
 
         public void update() {
             if(GameManager.getBaseList().isEmpty()) {
-                DebugManager.print("StrategyManager tried getting baseList but it is empty!");
+                Debug.print("StrategyManager tried getting baseList but it is empty!");
             }
             for (BaseInfo baseInfo : GameManager.getBaseList()) {
                 checkAndAdjustBaseSaturation(baseInfo);
@@ -72,7 +70,7 @@ public class StrategyManager {
                             assignWorkerToBuild(worker, buildingToBeBuilt, closestBase.getBase().getLocation(), GameManager.PRIORITY_ONE);*/
                         }
                         else if(buildingToBeBuilt != null){
-                            DebugManager.print("SENDING " + worker.getUnit() + " TO BUILD " + buildingToBeBuilt + "...");
+                            Debug.print("SENDING " + worker.getUnit() + " TO BUILD " + buildingToBeBuilt + "...");
                             //assign a worker to make it
                             TilePosition buildingLocation = new TilePosition(game.getBuildLocation(GameManager.getRace().getSupplyProvider(), BroodWarClient.getPlayer().getStartLocation()));
                             assignWorkerToBuild(worker, buildingToBeBuilt, buildingLocation, GameManager.PRIORITY_ONE);
