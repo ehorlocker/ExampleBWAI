@@ -1,18 +1,15 @@
 package com.example.bwbot;
 
-import bwapi.Unit;
 import bwem.Base;
 
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Objects;
 
-public class BaseInfo{
+public class OccupiedBase {
     Base base;
     ExampleUnit resourceDepot; //needs to be building object eventually
     ArrayList<Worker> workersAtBase = new ArrayList<Worker>();
 
-    BaseInfo(Base base, ExampleUnit resourceDepot) {
+    OccupiedBase(Base base, ExampleUnit resourceDepot) {
         this.base = base;
         this.resourceDepot = resourceDepot;
     }
@@ -67,6 +64,6 @@ public class BaseInfo{
         if(o.getClass() != this.getClass())
             return false;
 
-        return (((BaseInfo) o).getBase() == this.base);
+        return (((OccupiedBase) o).getBase() == this.base);
     }
 }

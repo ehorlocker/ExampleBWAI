@@ -2,7 +2,6 @@ package com.example.bwbot;
 
 import bwapi.Pair;
 import bwapi.UnitCommand;
-import jdk.nashorn.internal.runtime.Debug;
 
 import java.util.Comparator;
 import java.util.PriorityQueue;

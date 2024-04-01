@@ -67,7 +67,6 @@ public class BroodWarClient extends DefaultBWListener {
     @Override
     public void onStart() {
         game = bwClient.getGame();
-
         bwem = new BWEM(game);
         try {
             bwem.initialize();
@@ -79,8 +78,7 @@ public class BroodWarClient extends DefaultBWListener {
         player = game.self();
 
         Debug debug = new Debug();
-        //FIXME: this sucks
-        GameManager.getInstance();
+        GameManager.init();
 
         for (BroodWarEventListener broodWarEventListener: broodWarEventListeners) {
             broodWarEventListener.onStart();

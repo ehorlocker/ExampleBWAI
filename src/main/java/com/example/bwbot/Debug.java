@@ -18,7 +18,6 @@ public class Debug extends BroodWarEventListener {
 
     public static void print(String out) {
         if(debug) {
-            //System.out.println(out);
             logger.info(out);
         }
     }
@@ -39,8 +38,8 @@ public class Debug extends BroodWarEventListener {
         BroodWarClient.getGame().drawTextScreen(100, 100, "");
 
         //TODO: Refactor
-        for (final BaseInfo baseInfo : GameManager.getInstance().getBaseList()) {
-            Base base = baseInfo.getBase();
+        for (final OccupiedBase occupiedBase : GameManager.getInstance().getBaseList()) {
+            Base base = occupiedBase.getBase();
             game.drawBoxMap(
                     base.getLocation().toPosition(),
                     base.getLocation().toPosition().add(new Position(128, 96)),
@@ -48,7 +47,7 @@ public class Debug extends BroodWarEventListener {
             game.drawTextMap(
                     base.getCenter().getX() - 40,
                     base.getCenter().getY() - ONE_TILE * 2,
-                    ("SCV Count: " + baseInfo.getWorkerCount() + "/16"),
+                    ("SCV Count: " + occupiedBase.getWorkerCount() + "/16"),
                     Text.White);
         }
     }

@@ -1,0 +1,34 @@
+[
+  {
+    "supplyNeeded": 9,
+    "unitToBuild": "Terran_Supply_Depot"
+  },
+  {
+    "supplyNeeded": 9,
+    "unitToBuild": "Terran_Barracks"
+  },
+  {
+    "supplyNeeded": 14,
+    "unitToBuild": "Terran_Supply_Depot"
+  },
+  {
+    "supplyNeeded": 14,
+    "unitToBuild": "Terran_Barracks"
+  },
+  {
+    "supplyNeeded": 18,
+    "unitToBuild": "Terran_Refinery"
+  },
+  {
+    "supplyNeeded": 19,
+    "unitToBuild": "Terran_Academy"
+  },
+  {
+    "supplyNeeded": 23,
+    "unitToBuild": "Terran_Supply_Depot"
+  },
+  {
+    "supplyNeeded": 30,
+    "unitToBuild": "Terran_Supply_Depot"
+  }
+]

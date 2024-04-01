@@ -14,20 +14,24 @@ public class StrategyManager {
         private Game game = BroodWarClient.getGame();
 
         public void update() {
-            if(GameManager.getBaseList().isEmpty()) {
+            if (GameManager.getBaseList().isEmpty()) {
                 Debug.print("StrategyManager tried getting baseList but it is empty!");
             }
-            for (BaseInfo baseInfo : GameManager.getBaseList()) {
-                checkAndAdjustBaseSaturation(baseInfo);
+            for (OccupiedBase occupiedBase : GameManager.getBaseList()) {
+                checkAndAdjustBaseSaturation(occupiedBase);
             }
             checkBuildOrder();
             updateToBeBuilt();
         }
 
-        public boolean checkAndAdjustBaseSaturation(BaseInfo baseInfo) {
-            if(!baseInfo.isSaturated() && !baseInfo.isTraining()) {
-                ExampleUnitCommand commandToAdd = new ExampleUnitCommand(UnitCommand.train(baseInfo.getResourceDepot().getUnit(), GameManager.getRace().getWorker()), GameManager.PRIORITY_ONE);
-                baseInfo.getResourceDepot().addCommand(commandToAdd);
+        public boolean checkAndAdjustBaseSaturation(OccupiedBase occupiedBase) {
+            Game game = BroodWarClient.getGame();
+            if (!occupiedBase.isSaturated() &&
+                    !occupiedBase.isTraining() &&
+                    game != null &&
+                    BroodWarClient.getGame().canMake(UnitType.Terran_SCV)) {
+                ExampleUnitCommand commandToAdd = new ExampleUnitCommand(UnitCommand.train(occupiedBase.getResourceDepot().getUnit(), GameManager.getRace().getWorker()), GameManager.PRIORITY_ONE);
+                occupiedBase.getResourceDepot().addCommand(commandToAdd);
                 return false;
             }
             else {
@@ -37,7 +41,7 @@ public class StrategyManager {
 
         public void checkBuildOrder() {
             Queue<BuildOrder> buildOrder = GameManager.getBuildOrderQueue();
-            if(!buildOrder.isEmpty() &&
+            if (!buildOrder.isEmpty() &&
                     buildOrder.peek().isBuildOrderStep(game.self().supplyUsed())) {
                 System.out.println("Build order calls for: " + buildOrder.peek().getUnitToBuild());
                 toBeBuilt.add(GameManager.getBuildOrderQueue().remove().getUnitToBuild());
@@ -46,7 +50,7 @@ public class StrategyManager {
 
         public void updateToBeBuilt() {
             //is there something here in toBeBuilt
-            if(toBeBuilt.peek() != null && game.canMake(toBeBuilt.peek())) {
+            if (toBeBuilt.peek() != null && game.canMake(toBeBuilt.peek())) {
                 //if there is, assign a worker to build it
                 for (Worker worker : GameManager.getWorkerList()) {
                     // if a worker is idle or gathering minerals
@@ -54,7 +58,8 @@ public class StrategyManager {
                             worker.getUnit().isIdle() || worker.getUnit().isGatheringMinerals()) {
                         UnitType buildingToBeBuilt = toBeBuilt.poll();
                         // if we're building a command center
-                        if(buildingToBeBuilt != null && buildingToBeBuilt == GameManager.getRace().getResourceDepot()) {
+                        if (buildingToBeBuilt != null &&
+                                buildingToBeBuilt == GameManager.getRace().getResourceDepot()) {
                             /*BaseInfo closestBase = null;
                             for(Base base : ExampleBot.bwem.getMap().getBases()) {
                                 for(BaseInfo baseInfo : GameManager.getBaseList()) {
@@ -69,7 +74,7 @@ public class StrategyManager {
                             }
                             assignWorkerToBuild(worker, buildingToBeBuilt, closestBase.getBase().getLocation(), GameManager.PRIORITY_ONE);*/
                         }
-                        else if(buildingToBeBuilt != null){
+                        else if (buildingToBeBuilt != null){
                             Debug.print("SENDING " + worker.getUnit() + " TO BUILD " + buildingToBeBuilt + "...");
                             //assign a worker to make it
                             TilePosition buildingLocation = new TilePosition(game.getBuildLocation(GameManager.getRace().getSupplyProvider(), BroodWarClient.getPlayer().getStartLocation()));
