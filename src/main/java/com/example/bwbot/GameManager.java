@@ -8,7 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-public class GameManager {
+public class GameManager extends DefaultBWListener {
     private static GameManager instance;
     private static List<ExampleUnit> unitList;
     private static List<BaseInfo> playerBaseList;
@@ -20,6 +20,8 @@ public class GameManager {
     private static Queue<BuildOrder> buildOrderQueue = new LinkedList<BuildOrder>();
 
     private static List<BaseInfo> expansionBaseList = new LinkedList<BaseInfo>();
+
+    private Game game = BroodWarClient.getGame();
 
     private static Race race;
 
@@ -37,18 +39,18 @@ public class GameManager {
         playerBaseList = new ArrayList<BaseInfo>();
         workerList = new ArrayList<Worker>();
         raxList = new ArrayList<ExampleUnit>();
-        race = ExampleBot.game.self().getRace();
+        race = game.self().getRace();
         strategyManager = new StrategyManager();
 
         // we do this separate so the command center is correctly added
         // to the unit list in order
-        for(Unit startingUnit : ExampleBot.game.self().getUnits()) {
+        for(Unit startingUnit : game.self().getUnits()) {
             if(startingUnit.getType().isBuilding()) {
                 addUnitToUnitList(startingUnit);
                 DebugManager.print("Adding " + startingUnit.getType() + " to UnitList...");
             }
         }
-        for(Unit startingUnit : ExampleBot.game.self().getUnits()) {
+        for(Unit startingUnit : game.self().getUnits()) {
             if(!startingUnit.getType().isBuilding()) {
                 addUnitToUnitList(startingUnit);
                 DebugManager.print("Adding " + startingUnit.getType() + " to UnitList...");
@@ -56,7 +58,8 @@ public class GameManager {
         }
         // we need to make a list of expansions to move to so we begin by adding
         // all the bases on the map to a list, so we can order it.
-        for(Base base : ExampleBot.bwem.getMap().getBases()) {
+        //TODO: null check
+        for(Base base : BroodWarClient.getBwem().getMap().getBases()) {
             // check to see if the base is already in the list (we dont want to add the first one)
             if(!expansionBaseList.contains(new BaseInfo(base, null))) {
                 expansionBaseList.add(new BaseInfo(base, null));
@@ -91,7 +94,7 @@ public class GameManager {
 
     public void addUnitToUnitList(Unit unit) {
         // we have resource depot check first b/c starting workers need a base to attach to
-        if(unit.getType() == ExampleBot.game.self().getRace().getResourceDepot()) {
+        if(unit.getType() == game.self().getRace().getResourceDepot()) {
             // Setup a BaseInfo for baseList. Gets Base information from
             // location of the resource depot.
             // Problem: Flying in command center to new base b/c getClosestBase
@@ -104,7 +107,7 @@ public class GameManager {
             // adding command for gathering with nearest mineral can be optimized.
             // we could assign it a mineral and not allow more than 2 workers per mineral
             ExampleUnitCommand commandToAdd = new ExampleUnitCommand(UnitCommand.gather(worker.getUnit(),
-                    ExampleBot.game.getClosestUnit(unit.getPosition(), UnitFilter.IsMineralField)), PRIORITY_ONE);
+                    game.getClosestUnit(unit.getPosition(), UnitFilter.IsMineralField)), PRIORITY_ONE);
             worker.addCommand(commandToAdd);
 
             // add the new worker with the command to unitList
@@ -169,6 +172,18 @@ public class GameManager {
             instance = new GameManager();
         }
         return instance;
+    }
+
+    @Override
+    public void onUnitComplete(Unit unit) {
+        // janky fix for units not always getting added to the unit list
+        if(game.elapsedTime() > 4)
+            GameManager.getInstance().addUnitToUnitList(unit);
+
+        // TODO: a better way to filter buildings for GameManager
+        if(unit.getType() == UnitType.Terran_Barracks) {
+            GameManager.getInstance().addUnitToUnitList(unit);
+        }
     }
 }
 

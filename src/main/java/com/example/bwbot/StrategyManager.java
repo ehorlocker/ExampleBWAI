@@ -6,10 +6,14 @@ import sun.security.jca.GetInstance;
 
 import java.util.*;
 
+//TODO: This needs to be changed to something like static? idk
 public class StrategyManager {
 
         private PriorityQueue<UnitType> toBeBuilt = new PriorityQueue<UnitType>();
         private List<UnitType> beingBuilt = new LinkedList<UnitType>();
+
+        //FIXME: null check
+        private Game game = BroodWarClient.getGame();
 
         public void update() {
             if(GameManager.getBaseList().isEmpty()) {
@@ -36,7 +40,7 @@ public class StrategyManager {
         public void checkBuildOrder() {
             Queue<BuildOrder> buildOrder = GameManager.getBuildOrderQueue();
             if(!buildOrder.isEmpty() &&
-                    buildOrder.peek().isBuildOrderStep(ExampleBot.game.self().supplyUsed())) {
+                    buildOrder.peek().isBuildOrderStep(game.self().supplyUsed())) {
                 System.out.println("Build order calls for: " + buildOrder.peek().getUnitToBuild());
                 toBeBuilt.add(GameManager.getBuildOrderQueue().remove().getUnitToBuild());
             }
@@ -44,7 +48,7 @@ public class StrategyManager {
 
         public void updateToBeBuilt() {
             //is there something here in toBeBuilt
-            if(toBeBuilt.peek() != null && ExampleBot.game.canMake(toBeBuilt.peek())) {
+            if(toBeBuilt.peek() != null && game.canMake(toBeBuilt.peek())) {
                 //if there is, assign a worker to build it
                 for (Worker worker : GameManager.getWorkerList()) {
                     // if a worker is idle or gathering minerals
@@ -70,7 +74,7 @@ public class StrategyManager {
                         else if(buildingToBeBuilt != null){
                             DebugManager.print("SENDING " + worker.getUnit() + " TO BUILD " + buildingToBeBuilt + "...");
                             //assign a worker to make it
-                            TilePosition buildingLocation = new TilePosition(ExampleBot.game.getBuildLocation(GameManager.getRace().getSupplyProvider(), ExampleBot.self.getStartLocation()));
+                            TilePosition buildingLocation = new TilePosition(game.getBuildLocation(GameManager.getRace().getSupplyProvider(), BroodWarClient.getPlayer().getStartLocation()));
                             assignWorkerToBuild(worker, buildingToBeBuilt, buildingLocation, GameManager.PRIORITY_ONE);
                         }
                     }
