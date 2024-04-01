@@ -1,6 +1,7 @@
 package com.example.bwbot;
 
 import bwapi.*;
+import bwem.BWEM;
 import bwem.Base;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -8,7 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-public class GameManager extends DefaultBWListener {
+public class GameManager extends BroodWarEventListener {
     private static GameManager instance;
     private static List<ExampleUnit> unitList;
     private static List<BaseInfo> playerBaseList;
@@ -21,7 +22,7 @@ public class GameManager extends DefaultBWListener {
 
     private static List<BaseInfo> expansionBaseList = new LinkedList<BaseInfo>();
 
-    private Game game = BroodWarClient.getGame();
+    private Game game;
 
     private static Race race;
 
@@ -32,15 +33,14 @@ public class GameManager extends DefaultBWListener {
     public static final int PRIORITY_FIVE = 5;
 
     private GameManager() {
-        //ame = _game;
-        //self = game.self();
-
         unitList = new ArrayList<ExampleUnit>();
         playerBaseList = new ArrayList<BaseInfo>();
         workerList = new ArrayList<Worker>();
         raxList = new ArrayList<ExampleUnit>();
+        game = BroodWarClient.getGame();
         race = game.self().getRace();
         strategyManager = new StrategyManager();
+        BroodWarClient.getInstance().addListener(this);
 
         // we do this separate so the command center is correctly added
         // to the unit list in order
@@ -59,12 +59,16 @@ public class GameManager extends DefaultBWListener {
         // we need to make a list of expansions to move to so we begin by adding
         // all the bases on the map to a list, so we can order it.
         //TODO: null check
-        for(Base base : BroodWarClient.getBwem().getMap().getBases()) {
-            // check to see if the base is already in the list (we dont want to add the first one)
-            if(!expansionBaseList.contains(new BaseInfo(base, null))) {
-                expansionBaseList.add(new BaseInfo(base, null));
+        BWEM bwem =  BroodWarClient.getBwem();
+        if (bwem != null) {
+            for(Base base : bwem.getMap().getBases()) {
+                // check to see if the base is already in the list (we dont want to add the first one)
+                if(!expansionBaseList.contains(new BaseInfo(base, null))) {
+                    expansionBaseList.add(new BaseInfo(base, null));
+                }
             }
         }
+
 
         try {
             readBuildOrder();
@@ -79,7 +83,9 @@ public class GameManager extends DefaultBWListener {
             instance = new GameManager();
     }*/
 
-    public void update() {
+    @Override
+    public void onFrame() {
+        System.out.println("onFrame");
         for(ExampleUnit exampleUnit : unitList) {
             exampleUnit.update();
         }

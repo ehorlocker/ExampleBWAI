@@ -1,15 +1,5 @@
 package com.example.bwbot;
 
-import bwapi.*;
-import bwem.BWEM;
-import bwem.Base;
-
-import bwta.BWTA;
-import jbweb.Blocks;
-import jbweb.JBWEB;
-
-import java.util.*;
-
 /********************************************
  *  TODO: Add toBeBuilt to StrategyManager  *
  *        It might have custom objects idk  *
@@ -18,7 +8,7 @@ import java.util.*;
  *  once we're at spaghetti                 *
  ********************************************/
 
-class ExampleBot extends DefaultBWListener {
+class ExampleBot {
     public static void main(String[] args) {
         BroodWarClient.getInstance().init();
     }

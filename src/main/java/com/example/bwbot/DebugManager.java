@@ -17,6 +17,7 @@ public class DebugManager extends DefaultBWListener {
     @Override
     public void onFrame() {
         drawBases();
+        BroodWarClient.getGame().drawTextScreen(100, 100, "Hello World!");
     }
 
     private void drawBases() {
@@ -26,8 +27,6 @@ public class DebugManager extends DefaultBWListener {
         }
 
         BroodWarClient.getGame().drawTextScreen(100, 100, "");
-
-        GameManager.getInstance().update();
 
         //TODO: Refactor
         for (final BaseInfo baseInfo : GameManager.getInstance().getBaseList()) {
