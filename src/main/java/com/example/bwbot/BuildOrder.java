@@ -16,7 +16,7 @@ public class BuildOrder {
     }
 
     public boolean isBuildOrderStep(int supplyUsed) {
-        return (supplyUsed == (supplyNeeded * 2));
+        return (supplyUsed >= (supplyNeeded * 2));
     }
 
     public UnitType getUnitToBuild() {
@@ -29,7 +29,7 @@ public class BuildOrder {
 
     public String toString() {
         String result =
-                "-----------------" +
+                "\n-----------------" +
                 "\nSupply Needed: " + supplyNeeded +
                 "\nUnit to Build: " + unitToBuild +
                 "\n-----------------";

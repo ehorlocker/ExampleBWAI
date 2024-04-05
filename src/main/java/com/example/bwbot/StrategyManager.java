@@ -44,7 +44,10 @@ public class StrategyManager extends BroodWarEventListener {
         if (!buildOrder.isEmpty() &&
                 buildOrder.peek().isBuildOrderStep(player.supplyUsed())) {
             Debug.print("Build order calls for: " + buildOrder.peek().getUnitToBuild());
-            toBeBuilt.add(buildOrder.remove().getUnitToBuild());
+            Debug.print(buildOrder.toString());
+            toBeBuilt.add(buildOrder.peek().getUnitToBuild());
+            buildOrder.remove();
+            Debug.print(toBeBuilt.toString());
         }
         Queue<UnitBuildOrder> unitBuildOrder = GameManager.getUnitBuildOrderQueue();
         UnitBuildOrder unitBuildOrderToBuild = unitBuildOrder.peek();

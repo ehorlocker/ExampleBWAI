@@ -20,6 +20,7 @@ public class GameManager extends BroodWarEventListener {
     private static List<Worker> workerList;
     private static List<ExampleUnit> raxList;
     private static List<OccupiedBase> expansionBaseList = new LinkedList<OccupiedBase>();
+    private boolean addedInitialWorkers = false;
 
     private static Queue<BuildOrder> buildOrderQueue = new LinkedList<BuildOrder>();
     private static Queue<UnitBuildOrder> unitBuildOrderQueue = new LinkedList<UnitBuildOrder>();
@@ -41,20 +42,6 @@ public class GameManager extends BroodWarEventListener {
         strategyManager = new StrategyManager();
         BroodWarClient.getInstance().addListener(this);
 
-        // we do this separate so the command center is correctly added
-        // to the unit list in order
-        for (Unit startingUnit : player.getUnits()) {
-            if (startingUnit.getType().isBuilding()) {
-                addUnitToUnitList(startingUnit);
-                Debug.print("Adding " + startingUnit.getType() + " to UnitList...");
-            }
-        }
-        for (Unit startingUnit : player.getUnits()) {
-            if (!startingUnit.getType().isBuilding()) {
-                addUnitToUnitList(startingUnit);
-                Debug.print("Adding " + startingUnit.getType() + " to UnitList...");
-            }
-        }
         // we need to make a list of expansions to move to so we begin by adding
         // all the bases on the map to a list, so we can order it.
         BWEM bwem =  BroodWarClient.getBwem();
@@ -97,15 +84,6 @@ public class GameManager extends BroodWarEventListener {
         for(OccupiedBase occupiedBase : playerBaseList) {
             occupiedBase.getResourceDepot().update();
         }
-        /*for(ExampleUnit rax: raxList) {
-            Game game = BroodWarClient.getGame();
-            if(!rax.getUnit().isTraining() &&
-                    game != null &&
-                    game.canMake(UnitType.Terran_Marine)) {
-                rax.addCommand(new ExampleUnitCommand(
-                        UnitCommand.train(rax.getUnit(), UnitType.Terran_Marine), PRIORITY_ONE));
-            }
-        }*/
         strategyManager.update();
     }
 
@@ -116,8 +94,13 @@ public class GameManager extends BroodWarEventListener {
             // location of the resource depot.
             // Problem: Flying in command center to new base b/c getClosestBase
             playerBaseList.add(new OccupiedBase(ExampleUtils.getClosestBase(unit), new ExampleUnit(unit)));
+            Debug.print("adding base");
+            if (!addedInitialWorkers) {
+                addInitialWorkers();
+            }
         }
         else if (unit.getType().isWorker()) {
+            Debug.print("adding worker");
             Worker worker = new Worker(unit);
 
             strategyManager.assignWorkerToMineClosestMineral(worker);
@@ -129,7 +112,7 @@ public class GameManager extends BroodWarEventListener {
             // we use a findClosestBase function to find the base it's in
             // and add it to the BaseInfo object that has that base
             Base closestBase = ExampleUtils.getClosestBase(worker.getUnit());
-            if(playerBaseList.isEmpty()) {
+            if (playerBaseList.isEmpty()) {
                 Debug.print("baseList was empty when trying to add " + worker.getUnit());
             }
             for(OccupiedBase occupiedBase : playerBaseList) {
@@ -141,11 +124,28 @@ public class GameManager extends BroodWarEventListener {
             }
         }
         else if (unit.getType() == UnitType.Terran_Barracks) {
+            Debug.print("adding rax");
             ExampleUnit raxExampleUnit = new ExampleUnit(unit);
             raxList.add(raxExampleUnit);
             unitList.add(raxExampleUnit);
         }
+    }
 
+    private void addInitialWorkers() {
+            for (int i = 0; i < 4; i++) {
+                if(playerBaseList.isEmpty()) {
+                    Debug.print("baseList was empty");
+                    return;
+                }
+                Worker worker = workerList.get(i);
+                Base closestBase = ExampleUtils.getClosestBase(worker.getUnit());
+                for(OccupiedBase occupiedBase : playerBaseList) {
+                    if(occupiedBase.getBase() == closestBase) {
+                        occupiedBase.addWorker(worker);
+                    }
+                }
+            }
+            addedInitialWorkers = true;
     }
 
     public void readBuildOrder()
@@ -194,7 +194,6 @@ public class GameManager extends BroodWarEventListener {
 
     public static GameManager getInstance() {
         if (instance == null) {
-            Debug.print("making gamemanager");
             instance = new GameManager();
         }
         return instance;
@@ -202,14 +201,7 @@ public class GameManager extends BroodWarEventListener {
 
     @Override
     public void onUnitComplete(Unit unit) {
-        // janky fix for units not always getting added to the unit list
-        if (game.elapsedTime() > 4)
-            addUnitToUnitList(unit);
-
-        // TODO: a better way to filter buildings for GameManager
-        if (unit.getType() == UnitType.Terran_Barracks) {
-            addUnitToUnitList(unit);
-        }
+        addUnitToUnitList(unit);
     }
 }
 
