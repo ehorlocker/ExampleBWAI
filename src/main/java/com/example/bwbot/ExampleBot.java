@@ -1,9 +1,9 @@
 package com.example.bwbot;
 
 /********************************************
- *  TODO: Add toBeBuilt to StrategyManager  *
- *        It might have custom objects idk  *
- *                                          *
+ *  TODO: Remove entry from beingBuilt      *
+ *   (maybe make seperate) when constructed *
+ *  TODO: Use SCV after it's done building  *
  *  this may get recreated at some point    *
  *  once we're at spaghetti                 *
  ********************************************/

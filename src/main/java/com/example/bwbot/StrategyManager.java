@@ -10,9 +10,8 @@ public class StrategyManager extends BroodWarEventListener {
     private PriorityQueue<UnitType> toBeBuilt = new PriorityQueue<UnitType>();
     private List<UnitType> beingBuilt = new LinkedList<UnitType>();
 
-    //FIXME: null check
     private Game game = BroodWarClient.getGame();
-    int mineralsAfterPlanning;
+    private int mineralsAfterPlanning;
 
     public StrategyManager() {
         BroodWarClient.getInstance().addListener(this);

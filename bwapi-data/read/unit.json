@@ -1,5 +1,10 @@
 [
   {
+    "supplyNeeded":4,
+    "unitToBuild":"Terran_SCV",
+    "numberToBuild":5
+  },
+  {
     "supplyNeeded":9,
     "unitToBuild":"Terran_SCV",
     "numberToBuild":4

@@ -2,17 +2,19 @@ package com.example.bwbot;
 
 import bwapi.UnitType;
 
-public class BuildOrder {
+public class UnitBuildOrder {
     private UnitType unitToBuild;
     private int supplyNeeded;
+    private int numberToBuild;
 
-    BuildOrder() {
+    UnitBuildOrder() {
 
     }
 
-    BuildOrder(int supplyNeeded, String unitToBuild) {
+    UnitBuildOrder(int supplyNeeded, String unitToBuild, int numberToBuild) {
         this.supplyNeeded = supplyNeeded;
         this.unitToBuild = UnitType.valueOf(unitToBuild);
+        this.numberToBuild = numberToBuild;
     }
 
     public boolean isBuildOrderStep(int supplyUsed) {
@@ -25,6 +27,10 @@ public class BuildOrder {
 
     public int getSupplyNeeded() {
         return supplyNeeded;
+    }
+
+    public int getNumberToBuild() {
+        return numberToBuild;
     }
 
     public String toString() {

@@ -11,20 +11,18 @@ import java.util.*;
 
 public class GameManager extends BroodWarEventListener {
     private static GameManager instance;
+    private Game game;
+    private StrategyManager strategyManager;
+    private Player player;
+    private static Race race;
     private static List<ExampleUnit> unitList;
     private static List<OccupiedBase> playerBaseList;
     private static List<Worker> workerList;
     private static List<ExampleUnit> raxList;
-    private static StrategyManager strategyManager;
-
-
-    private static Queue<BuildOrder> buildOrderQueue = new LinkedList<BuildOrder>();
-
     private static List<OccupiedBase> expansionBaseList = new LinkedList<OccupiedBase>();
 
-    private Game game;
-
-    private static Race race;
+    private static Queue<BuildOrder> buildOrderQueue = new LinkedList<BuildOrder>();
+    private static Queue<UnitBuildOrder> unitBuildOrderQueue = new LinkedList<UnitBuildOrder>();
 
     public static final int PRIORITY_ONE = 1;
     public static final int PRIORITY_TWO = 2;
@@ -39,18 +37,19 @@ public class GameManager extends BroodWarEventListener {
         raxList = new ArrayList<ExampleUnit>();
         game = BroodWarClient.getGame();
         race = BroodWarClient.getPlayer().getRace();
+        player = game.self();
         strategyManager = new StrategyManager();
         BroodWarClient.getInstance().addListener(this);
 
         // we do this separate so the command center is correctly added
         // to the unit list in order
-        for (Unit startingUnit : game.self().getUnits()) {
+        for (Unit startingUnit : player.getUnits()) {
             if (startingUnit.getType().isBuilding()) {
                 addUnitToUnitList(startingUnit);
                 Debug.print("Adding " + startingUnit.getType() + " to UnitList...");
             }
         }
-        for (Unit startingUnit : game.self().getUnits()) {
+        for (Unit startingUnit : player.getUnits()) {
             if (!startingUnit.getType().isBuilding()) {
                 addUnitToUnitList(startingUnit);
                 Debug.print("Adding " + startingUnit.getType() + " to UnitList...");
@@ -71,6 +70,13 @@ public class GameManager extends BroodWarEventListener {
 
         try {
             readBuildOrder();
+        }
+        catch (Exception exception) {
+            exception.printStackTrace();
+        }
+
+        try {
+            readUnitBuildOrder();
         }
         catch (Exception exception) {
             exception.printStackTrace();
@@ -147,7 +153,15 @@ public class GameManager extends BroodWarEventListener {
         ObjectMapper mapper = new ObjectMapper();
         buildOrderQueue = new LinkedList<BuildOrder>(Arrays.asList(mapper.readValue(
                 new File("bwapi-data/read/building.json"), BuildOrder[].class)));
-        System.out.println(buildOrderQueue);
+        Debug.print(buildOrderQueue.toString());
+    }
+
+    public void readUnitBuildOrder()
+            throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        unitBuildOrderQueue = new LinkedList<UnitBuildOrder>(Arrays.asList(mapper.readValue(
+                new File("bwapi-data/read/unit.json"), UnitBuildOrder[].class)));
+        Debug.print(unitBuildOrderQueue.toString());
     }
 
     public static Queue<BuildOrder> getBuildOrderQueue() {
