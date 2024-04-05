@@ -1,18 +1,47 @@
 [
   {
     "supplyNeeded":9,
-    "unitToBuild":"Terran_Supply_Depot"
+    "unitToBuild":"Terran_SCV",
+    "numberToBuild":4
   },
   {
-    "supplyNeeded":11,
-    "unitToBuild":"Terran_Barracks"
+    "supplyNeeded":13,
+    "unitToBuild":"Terran_Marine",
+    "numberToBuild":1
+  },
+  {
+    "supplyNeeded":14,
+    "unitToBuild":"Terran_SCV",
+    "numberToBuild":2
   },
   {
     "supplyNeeded":15,
-    "unitToBuild":"Terran_Barracks"
+    "unitToBuild":"Terran_Marine",
+    "numberToBuild":10
   },
   {
-    "supplyNeeded":22,
-    "unitToBuild":"Terran_Supply_Depot"
+    "supplyNeeded":21,
+    "unitToBuild":"Terran_SCV",
+    "numberToBuild":1
+  },
+  {
+    "supplyNeeded":25,
+    "unitToBuild":"Terran_Medic",
+    "numberToBuild":2
+  },
+  {
+    "supplyNeeded":27,
+    "unitToBuild":"Terran_SCV",
+    "numberToBuild":1
+  },
+  {
+    "supplyNeeded":28,
+    "unitToBuild":"Terran_Firebat",
+    "numberToBuild":2
+  },
+  {
+    "supplyNeeded":30,
+    "unitToBuild":"Terran_Marine",
+    "numberToBuild":4
   }
 ]

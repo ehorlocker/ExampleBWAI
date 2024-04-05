@@ -95,6 +95,14 @@ public class StrategyManager extends BroodWarEventListener {
         beingBuilt.add(buildingToBeBuilt);
     }
 
+    public void assignWorkerToMineClosestMineral(Worker worker) {
+        // adding command for gathering with nearest mineral can be optimized.
+        // we could assign it a mineral and not allow more than 2 workers per mineral
+        ExampleUnitCommand commandToAdd = new ExampleUnitCommand(UnitCommand.gather(worker.getUnit(),
+                game.getClosestUnit(worker.getUnit().getPosition(), UnitFilter.IsMineralField)), GameManager.PRIORITY_ONE);
+        worker.addCommand(commandToAdd);
+    }
+
     @Override
     public void onUnitComplete(Unit unit) {
         if (unit.getType().isBuilding()) {

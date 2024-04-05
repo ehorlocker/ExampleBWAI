@@ -112,19 +112,11 @@ public class GameManager extends BroodWarEventListener {
             playerBaseList.add(new OccupiedBase(ExampleUtils.getClosestBase(unit), new ExampleUnit(unit)));
         }
         else if (unit.getType().isWorker()) {
-            // this will get removed later, but we send workers straight to a mineral patch
             Worker worker = new Worker(unit);
 
-            // adding command for gathering with nearest mineral can be optimized.
-            // we could assign it a mineral and not allow more than 2 workers per mineral
-            ExampleUnitCommand commandToAdd = new ExampleUnitCommand(UnitCommand.gather(worker.getUnit(),
-                    game.getClosestUnit(unit.getPosition(), UnitFilter.IsMineralField)), PRIORITY_ONE);
-            worker.addCommand(commandToAdd);
+            strategyManager.assignWorkerToMineClosestMineral(worker);
 
-            // add the new worker with the command to unitList
             unitList.add(worker);
-
-            //add them to the worker list too
             workerList.add(worker);
 
             // in order to add the worker to the list of workers at a base,
@@ -140,7 +132,6 @@ public class GameManager extends BroodWarEventListener {
                     //DebugManager.print("adding " + worker.getUnit() + " to baseList");
                     occupiedBase.addWorker(worker);
                 }
-
             }
         }
         else if (unit.getType() == UnitType.Terran_Barracks) {
