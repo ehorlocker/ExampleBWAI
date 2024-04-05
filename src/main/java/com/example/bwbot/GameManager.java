@@ -97,7 +97,7 @@ public class GameManager extends BroodWarEventListener {
         for(OccupiedBase occupiedBase : playerBaseList) {
             occupiedBase.getResourceDepot().update();
         }
-        for(ExampleUnit rax: raxList) {
+        /*for(ExampleUnit rax: raxList) {
             Game game = BroodWarClient.getGame();
             if(!rax.getUnit().isTraining() &&
                     game != null &&
@@ -105,7 +105,7 @@ public class GameManager extends BroodWarEventListener {
                 rax.addCommand(new ExampleUnitCommand(
                         UnitCommand.train(rax.getUnit(), UnitType.Terran_Marine), PRIORITY_ONE));
             }
-        }
+        }*/
         strategyManager.update();
     }
 
@@ -168,6 +168,10 @@ public class GameManager extends BroodWarEventListener {
         return buildOrderQueue;
     }
 
+    public static Queue<UnitBuildOrder> getUnitBuildOrderQueue() {
+        return unitBuildOrderQueue;
+    }
+
     public static List<OccupiedBase> getBaseList() {
         return playerBaseList;
     }
@@ -182,6 +186,10 @@ public class GameManager extends BroodWarEventListener {
 
     public static List<Worker> getWorkerList() {
         return workerList;
+    }
+
+    public static List<ExampleUnit> getRaxList() {
+        return raxList;
     }
 
     public static GameManager getInstance() {
